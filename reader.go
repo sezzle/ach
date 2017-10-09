@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+
+	"github.com/golang/glog"
 )
 
 // ParseError is returned for parsing reader errors.
@@ -74,7 +76,6 @@ func (r *Reader) Read() (File, error) {
 		line := r.scanner.Text()
 		r.lineNum++
 		lineLength := len(line)
-
 		switch {
 		case r.lineNum == 1 && lineLength > RecordLength && lineLength%RecordLength == 0:
 			if err := r.processFixedWidthFile(&line); err != nil {
@@ -191,6 +192,7 @@ func (r *Reader) parseBatchHeader() error {
 	bh := NewBatchHeader()
 	bh.Parse(r.line)
 	if err := bh.Validate(); err != nil {
+		glog.Error("Error validating batch header: ", err)
 		return r.error(err)
 	}
 
@@ -248,8 +250,19 @@ func (r *Reader) parseAddenda() error {
 			msg := fmt.Sprintf(msgBatchAddendaIndicator)
 			return r.error(&FileError{FieldName: "AddendaRecordIndicator", Msg: msg})
 		}
+	case web, ccd, cor: // only care for returns
+		if entry.AddendaRecordIndicator == 1 {
+			returnAddenda := ReturnAddenda{}
+			returnAddenda.Parse(r.line)
+			if err := returnAddenda.Validate(); err != nil {
+				return r.error(err)
+			}
+			r.currentBatch.GetEntries()[entryIndex].AddReturnAddenda(returnAddenda)
+		} else {
+			msg := fmt.Sprintf(msgBatchAddendaIndicator)
+			return r.error(&FileError{FieldName: "AddendaRecordIndicator", Msg: msg})
+		}
 	}
-
 	return nil
 }
 

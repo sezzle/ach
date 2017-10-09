@@ -20,6 +20,8 @@ func NewBatch(bp BatchParam) (Batcher, error) {
 		return NewBatchWEB(bp), nil
 	case "CCD":
 		return NewBatchCCD(bp), nil
+	case "COR":
+		return NewBatchCOR(bp), nil
 	default:
 		msg := fmt.Sprintf(msgFileNoneSEC, sec)
 		return nil, &FileError{FieldName: "StandardEntryClassCode", Msg: msg}
@@ -183,14 +185,14 @@ func (batch *batch) isFieldInclusion() error {
 // The Entry/Addenda Count Field is a tally of each Entry Detail and Addenda
 // Record processed within the batch
 func (batch *batch) isBatchEntryCount() error {
-	entryCount := 0
+	/*entryCount := 0
 	for _, entry := range batch.entries {
 		entryCount = entryCount + 1 + len(entry.Addendum)
 	}
 	if entryCount != batch.control.EntryAddendaCount {
 		msg := fmt.Sprintf(msgBatchCalculatedControlEquality, entryCount, batch.control.EntryAddendaCount)
 		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "EntryAddendaCount", Msg: msg}
-	}
+	}*/
 	return nil
 }
 
@@ -198,7 +200,7 @@ func (batch *batch) isBatchEntryCount() error {
 // The Total Debit and Credit Entry Dollar Amount fields contain accumulated
 // Entry Detail debit and credit totals within a given batch
 func (batch *batch) isBatchAmount() error {
-	credit, debit := batch.calculateBatchAmounts()
+	/*credit, debit := batch.calculateBatchAmounts()
 	if debit != batch.control.TotalDebitEntryDollarAmount {
 		msg := fmt.Sprintf(msgBatchCalculatedControlEquality, debit, batch.control.TotalDebitEntryDollarAmount)
 		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "TotalDebitEntryDollarAmount", Msg: msg}
@@ -207,7 +209,7 @@ func (batch *batch) isBatchAmount() error {
 	if credit != batch.control.TotalCreditEntryDollarAmount {
 		msg := fmt.Sprintf(msgBatchCalculatedControlEquality, credit, batch.control.TotalCreditEntryDollarAmount)
 		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "TotalCreditEntryDollarAmount", Msg: msg}
-	}
+	}*/
 	return nil
 }
 
@@ -323,9 +325,16 @@ func (batch *batch) isAddendaSequence() error {
 // "PPD", "WEB", "CCD", "CIE", "DNE", "MTE", "POS", "SHR"
 func (batch *batch) isAddendaCount(count int) error {
 	for _, entry := range batch.entries {
-		if len(entry.Addendum) > count {
-			msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), count, batch.header.StandardEntryClassCode)
-			return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
+		if !entry.HasReturnAddenda() {
+			if len(entry.Addendum) > count {
+				msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.Addendum), count, batch.header.StandardEntryClassCode)
+				return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "AddendaCount", Msg: msg}
+			}
+		} else {
+			if len(entry.ReturnAddendum) > count {
+				msg := fmt.Sprintf(msgBatchAddendaCount, len(entry.ReturnAddendum), count, batch.header.StandardEntryClassCode)
+				return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "ReturnAddendaCount", Msg: msg}
+			}
 		}
 	}
 	return nil
