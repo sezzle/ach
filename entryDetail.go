@@ -7,8 +7,6 @@ package ach
 import (
 	"fmt"
 	"strconv"
-
-	"github.com/golang/glog"
 )
 
 // EntryDetail contains the actual transaction data for an individual entry.
@@ -233,7 +231,6 @@ func (ed *EntryDetail) AddAddenda(addenda Addenda) []Addenda {
 	ed.AddendaRecordIndicator = 1
 	// checks to make sure that we only have either or, not both
 	if ed.ReturnAddendum != nil {
-		glog.Error("Error adding addendum because return addenda exist")
 		return nil
 	}
 	ed.Addendum = append(ed.Addendum, addenda)
@@ -245,7 +242,6 @@ func (ed *EntryDetail) AddReturnAddenda(returnAddendum ReturnAddenda) []ReturnAd
 	ed.AddendaRecordIndicator = 1
 	// checks to make sure that we only have either or, not both
 	if ed.Addendum != nil {
-		glog.Error("Error adding return addendum because addenda exist")
 		return nil
 	}
 	ed.ReturnAddendum = append(ed.ReturnAddendum, returnAddendum)
@@ -314,6 +310,7 @@ func (ed *EntryDetail) TraceNumberField() string {
 	return ed.numericField(ed.TraceNumber, 15)
 }
 
+// HasReturnAddenda returns true if entry has return addenda
 func (ed *EntryDetail) HasReturnAddenda() bool {
 	return ed.ReturnAddendum != nil
 }
