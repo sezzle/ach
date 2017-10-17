@@ -46,7 +46,7 @@ func (batch *BatchCOR) Validate() error {
 
 	// Add type specific validation.
 	if batch.header.StandardEntryClassCode != "COR" {
-		msg := fmt.Sprintf(msgBatchSECType, batch.header.StandardEntryClassCode, "WEB")
+		msg := fmt.Sprintf(msgBatchSECType, batch.header.StandardEntryClassCode, "COR")
 		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "StandardEntryClassCode", Msg: msg}
 	}
 
