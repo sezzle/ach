@@ -187,7 +187,7 @@ func (batch *batch) isFieldInclusion() error {
 func (batch *batch) isBatchEntryCount() error {
 	entryCount := 0
 	for _, entry := range batch.entries {
-		entryCount = entryCount + 1 + len(entry.Addendum)
+		entryCount = entryCount + 1 + len(entry.Addendum) + len(entry.ReturnAddendum)
 	}
 	if entryCount != batch.control.EntryAddendaCount {
 		msg := fmt.Sprintf(msgBatchCalculatedControlEquality, entryCount, batch.control.EntryAddendaCount)
