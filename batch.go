@@ -106,7 +106,10 @@ func (batch *batch) build() error {
 	seq := 1
 	for i, entry := range batch.entries {
 		entryCount = entryCount + 1 + len(entry.Addendum)
-		batch.entries[i].setTraceNumber(batch.header.ODFIIdentification, seq)
+		// if current entry's trace number is already set then keep it, allows for override
+		if batch.entries[i].TraceNumber == 0 {
+			batch.entries[i].setTraceNumber(batch.header.ODFIIdentification, seq)
+		}
 		seq++
 		addendaSeq := 1
 		for x := range entry.Addendum {
