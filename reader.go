@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+
+	"github.com/golang/glog"
 )
 
 // ParseError is returned for parsing reader errors.
@@ -190,6 +192,7 @@ func (r *Reader) parseBatchHeader() error {
 	bh := NewBatchHeader()
 	bh.Parse(r.line)
 	if err := bh.Validate(); err != nil {
+		glog.Error("Error validating batch header: ", err)
 		return r.error(err)
 	}
 

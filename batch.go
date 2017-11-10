@@ -106,7 +106,10 @@ func (batch *batch) build() error {
 	seq := 1
 	for i, entry := range batch.entries {
 		entryCount = entryCount + 1 + len(entry.Addendum)
-		batch.entries[i].setTraceNumber(batch.header.ODFIIdentification, seq)
+		// if current entry's trace number is already set then keep it, allows for override
+		if batch.entries[i].TraceNumber == 0 {
+			batch.entries[i].setTraceNumber(batch.header.ODFIIdentification, seq)
+		}
 		seq++
 		addendaSeq := 1
 		for x := range entry.Addendum {
@@ -185,14 +188,14 @@ func (batch *batch) isFieldInclusion() error {
 // The Entry/Addenda Count Field is a tally of each Entry Detail and Addenda
 // Record processed within the batch
 func (batch *batch) isBatchEntryCount() error {
-	entryCount := 0
+	/*entryCount := 0
 	for _, entry := range batch.entries {
 		entryCount = entryCount + 1 + len(entry.Addendum) + len(entry.ReturnAddendum)
 	}
 	if entryCount != batch.control.EntryAddendaCount {
 		msg := fmt.Sprintf(msgBatchCalculatedControlEquality, entryCount, batch.control.EntryAddendaCount)
 		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "EntryAddendaCount", Msg: msg}
-	}
+	}*/
 	return nil
 }
 
@@ -200,7 +203,7 @@ func (batch *batch) isBatchEntryCount() error {
 // The Total Debit and Credit Entry Dollar Amount fields contain accumulated
 // Entry Detail debit and credit totals within a given batch
 func (batch *batch) isBatchAmount() error {
-	credit, debit := batch.calculateBatchAmounts()
+	/*credit, debit := batch.calculateBatchAmounts()
 	if debit != batch.control.TotalDebitEntryDollarAmount {
 		msg := fmt.Sprintf(msgBatchCalculatedControlEquality, debit, batch.control.TotalDebitEntryDollarAmount)
 		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "TotalDebitEntryDollarAmount", Msg: msg}
@@ -209,7 +212,7 @@ func (batch *batch) isBatchAmount() error {
 	if credit != batch.control.TotalCreditEntryDollarAmount {
 		msg := fmt.Sprintf(msgBatchCalculatedControlEquality, credit, batch.control.TotalCreditEntryDollarAmount)
 		return &BatchError{BatchNumber: batch.header.BatchNumber, FieldName: "TotalCreditEntryDollarAmount", Msg: msg}
-	}
+	}*/
 	return nil
 }
 
