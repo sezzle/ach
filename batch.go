@@ -1,6 +1,9 @@
 package ach
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+)
 
 // Batch holds the Batch Header and Batch Control and all Entry Records for PPD Entries
 type batch struct {
@@ -106,9 +109,13 @@ func (batch *batch) build() error {
 	seq := 1
 	for i, entry := range batch.entries {
 		entryCount = entryCount + 1 + len(entry.Addendum)
-		// Allows for manual override of trace numbers of current entry's trace number is already set before
+		// Allows for manual override of trace numbers if current entry's trace number is already set before
 		// the batch is built.
-		if batch.entries[i].TraceNumber == 0 {
+		currentTraceNumberODFI, err := strconv.Atoi(entry.TraceNumberField()[:8])
+		if err != nil {
+			return err
+		}
+		if currentTraceNumberODFI != batch.header.ODFIIdentification {
 			batch.entries[i].setTraceNumber(batch.header.ODFIIdentification, seq)
 		}
 		seq++
