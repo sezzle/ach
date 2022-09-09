@@ -235,7 +235,7 @@ func (r *Reader) parseAddenda() error {
 	entry := r.currentBatch.GetEntries()[entryIndex]
 
 	switch sec := r.currentBatch.GetHeader().StandardEntryClassCode; sec {
-	case ppd:
+	default:
 		if entry.AddendaRecordIndicator == 1 {
 			addenda := Addenda{}
 			addenda.Parse(r.line)
@@ -247,7 +247,7 @@ func (r *Reader) parseAddenda() error {
 			msg := fmt.Sprintf(msgBatchAddendaIndicator)
 			return r.error(&FileError{FieldName: "AddendaRecordIndicator", Msg: msg})
 		}
-	case web, ccd, cor: // only care for returns
+	case web, ccd, cor, ppd: // only care for returns
 		if entry.AddendaRecordIndicator == 1 {
 			returnAddenda := ReturnAddenda{}
 			returnAddenda.Parse(r.line)

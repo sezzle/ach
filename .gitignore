@@ -18,6 +18,9 @@ _test
 !.vscode/launch.json
 !.vscode/extensions.json
 
+# Ignore IntelliJ files
+.idea
+
 # Architecture specific extensions/prefixes
 *.[568vq]
 [568vq].out
