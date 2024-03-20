@@ -3,7 +3,6 @@ package ach
 // written
 
 import (
-	"flag"
 	"strings"
 	"time"
 )
@@ -11,10 +10,6 @@ import (
 const (
 	timeFormat = "060102" // for date of death
 )
-
-func init() {
-	flag.Lookup("alsologtostderr").Value.Set("true")
-}
 
 // ReturnAddenda
 type ReturnAddenda struct {
