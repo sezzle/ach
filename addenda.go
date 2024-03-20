@@ -1,14 +1,9 @@
 package ach
 
 import (
-	"flag"
 	"fmt"
 	"strings"
 )
-
-func init() {
-	flag.Lookup("alsologtostderr").Value.Set("true")
-}
 
 // Addenda provides business transaction information in a machine
 // readable format. It is usually formatted according to ANSI, ASC, X12 Standard
